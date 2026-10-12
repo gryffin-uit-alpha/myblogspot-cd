@@ -24,7 +24,7 @@ frontend:
       memory: 192Mi
 ingress:
   hosts:
-    - host: staging.gryffin-uit.site
+    - host: staging.hnblong.site
       paths:
         - path: /api
           pathType: Prefix
@@ -47,4 +47,4 @@ ingress:
   tls:
     - secretName: myblogspot-staging-tls
       hosts:
-        - staging.gryffin-uit.site
+        - staging.hnblong.site

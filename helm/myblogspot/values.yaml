@@ -137,7 +137,7 @@ frontend:
   env:
     PORT: "3000"
     NODE_ENV: "production"
-    NEXT_PUBLIC_API_URL: "https://gryffin-uit.site/api/v1"
+    NEXT_PUBLIC_API_URL: "https://hnblong.site/api/v1"
     INTERNAL_API_URL: "http://myblogspot-backend:8080/api/v1"
 
 # ==========================================
@@ -151,7 +151,7 @@ ingress:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
   hosts:
-    - host: gryffin-uit.site
+    - host: hnblong.site
       paths:
         - path: /api
           pathType: Prefix
@@ -174,7 +174,7 @@ ingress:
   tls:
     - secretName: myblogspot-tls-cert
       hosts:
-        - gryffin-uit.site
+        - hnblong.site
 
 # ==========================================
 # Zero-Trust Network Policy

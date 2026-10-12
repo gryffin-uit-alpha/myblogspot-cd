@@ -23,7 +23,7 @@ frontend:
 
 ingress:
   hosts:
-    - host: gryffin-uit.site
+    - host: hnblong.site
       paths:
         - path: /api
           pathType: Prefix
@@ -46,7 +46,7 @@ ingress:
   tls:
     - secretName: myblogspot-prod-tls
       hosts:
-        - gryffin-uit.site
+        - hnblong.site
 
 serviceMonitor:
   enabled: true
