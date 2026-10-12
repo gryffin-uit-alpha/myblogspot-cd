@@ -3,6 +3,8 @@ environment: staging
 
 backend:
   replicaCount: 1
+  image:
+    tag: "latest" # Updated automatically by CI/CD GitOps
   resources:
     requests:
       cpu: 50m
@@ -13,6 +15,8 @@ backend:
 
 frontend:
   replicaCount: 1
+  image:
+    tag: "latest" # Updated automatically by CI/CD GitOps
   resources:
     requests:
       cpu: 50m
