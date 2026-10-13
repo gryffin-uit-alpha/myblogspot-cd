@@ -56,6 +56,11 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.backend.secretName }}
                   key: REDIS_URL
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backend.secretName }}
+                  key: DB_PASSWORD
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:

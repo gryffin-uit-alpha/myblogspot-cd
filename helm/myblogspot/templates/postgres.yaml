@@ -1,0 +1,74 @@
+{{- if .Values.postgres.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "myblogspot.fullname" . }}-postgres-init
+  labels:
+    {{- include "myblogspot.labels" . | nindent 4 }}
+data:
+  init.sql: |
+{{ .Files.Get "files/schema.sql" | indent 4 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "myblogspot.fullname" . }}-postgres
+  labels:
+    {{- include "myblogspot.labels" . | nindent 4 }}
+    app.kubernetes.io/component: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "myblogspot.name" . }}-postgres
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "myblogspot.name" . }}-postgres
+        app.kubernetes.io/component: database
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15-alpine
+          ports:
+            - containerPort: 5432
+              name: postgres
+          env:
+            - name: POSTGRES_USER
+              value: {{ .Values.postgres.user | default "myblogspot" | quote }}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.postgres.password | default "secret-staging-password" | quote }}
+            - name: POSTGRES_DB
+              value: {{ .Values.postgres.db | default "myblogspot_staging" | quote }}
+          volumeMounts:
+            - name: init-script
+              mountPath: /docker-entrypoint-initdb.d/init.sql
+              subPath: init.sql
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+      volumes:
+        - name: init-script
+          configMap:
+            name: {{ include "myblogspot.fullname" . }}-postgres-init
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myblogspot-postgres
+  labels:
+    {{- include "myblogspot.labels" . | nindent 4 }}
+    app.kubernetes.io/component: database
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+      targetPort: 5432
+      name: postgres
+  selector:
+    app.kubernetes.io/name: {{ include "myblogspot.name" . }}-postgres
+{{- end }}

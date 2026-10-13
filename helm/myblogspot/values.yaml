@@ -188,3 +188,13 @@ networkPolicy:
 serviceMonitor:
   enabled: false
   interval: 15s
+
+# ==========================================
+# In-cluster PostgreSQL (Staging / Dev)
+# ==========================================
+postgres:
+  enabled: false
+  user: "myblogspot"
+  password: "secret-password"
+  db: "myblogspot_dev"
+
