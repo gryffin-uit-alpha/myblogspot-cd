@@ -1,17 +1,15 @@
 # Staging Environment Overrides
 environment: staging
-
 postgres:
   enabled: true
   user: "myblogspot"
   password: "secret-staging-password"
   db: "myblogspot_staging"
-
 backend:
   replicaCount: 1
   image:
     repository: 736052310305.dkr.ecr.ap-southeast-2.amazonaws.com/staging-myblogspot-backend
-    tag: "5725eb360ada6a868760231e4ff49871bf0f7ccd" # Updated automatically by CI/CD GitOps
+    tag: "e0b1aea4c9cb79a465dd1e2002d22499647931ec" # Updated automatically by CI/CD GitOps
   resources:
     requests:
       cpu: 50m
@@ -39,12 +37,11 @@ backend:
     DB_PASSWORD: "secret-staging-password"
     REDIS_URL: "redis://myblogspot-redis:6379"
     JWT_SECRET: "staging-jwt-secret-key-123456"
-
 frontend:
   replicaCount: 1
   image:
     repository: 736052310305.dkr.ecr.ap-southeast-2.amazonaws.com/staging-myblogspot-frontend
-    tag: "5725eb360ada6a868760231e4ff49871bf0f7ccd" # Updated automatically by CI/CD GitOps
+    tag: "e0b1aea4c9cb79a465dd1e2002d22499647931ec" # Updated automatically by CI/CD GitOps
   resources:
     requests:
       cpu: 50m
@@ -57,7 +54,6 @@ frontend:
     NODE_ENV: "production"
     NEXT_PUBLIC_API_URL: ""
     INTERNAL_API_URL: "http://myblogspot-staging-backend:8080"
-
 ingress:
   enabled: true
   className: "alb"
@@ -88,6 +84,5 @@ ingress:
         - path: /
           pathType: Prefix
           service: frontend
-
 networkPolicy:
   enabled: false
