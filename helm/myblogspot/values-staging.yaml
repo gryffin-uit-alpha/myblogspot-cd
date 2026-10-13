@@ -3,7 +3,7 @@ environment: staging
 backend:
   replicaCount: 1
   image:
-    tag: "73d494ed4aa7146a8ca07cdc8a5b643772edbbee" # Updated automatically by CI/CD GitOps
+    tag: "5725eb360ada6a868760231e4ff49871bf0f7ccd" # Updated automatically by CI/CD GitOps
   resources:
     requests:
       cpu: 50m
@@ -14,7 +14,7 @@ backend:
 frontend:
   replicaCount: 1
   image:
-    tag: "73d494ed4aa7146a8ca07cdc8a5b643772edbbee" # Updated automatically by CI/CD GitOps
+    tag: "5725eb360ada6a868760231e4ff49871bf0f7ccd" # Updated automatically by CI/CD GitOps
   resources:
     requests:
       cpu: 50m
