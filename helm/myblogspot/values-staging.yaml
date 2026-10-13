@@ -55,8 +55,8 @@ frontend:
   env:
     PORT: "3000"
     NODE_ENV: "production"
-    NEXT_PUBLIC_API_URL: "https://staging.hnblong.site/api"
-    INTERNAL_API_URL: "http://myblogspot-backend:8080/api"
+    NEXT_PUBLIC_API_URL: ""
+    INTERNAL_API_URL: "http://myblogspot-staging-backend:8080"
 
 ingress:
   enabled: true
