@@ -31,6 +31,9 @@ backend:
     DB_SSLMODE: "disable"
     REDIS_ENABLED: "false"
     CORS_ALLOWED_ORIGINS: "https://staging.hnblong.site"
+    ADMIN_INITIAL_USERNAME: "admin"
+    ADMIN_INITIAL_PASSWORD: "Admin@123456"
+    ADMIN_INITIAL_EMAIL: "admin@hnblong.site"
   secrets:
     DB_URL: "postgresql://myblogspot:secret-staging-password@myblogspot-postgres:5432/myblogspot_staging?sslmode=disable"
     DB_PASSWORD: "secret-staging-password"
