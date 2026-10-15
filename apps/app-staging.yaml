@@ -1,6 +1,6 @@
 # ==============================================================================
-# ARGOCD APPLICATION: MYBLOGSPOT (STAGING)
-# Repo: CD Config Repository
+# SYNC WAVE 2: MYBLOGSPOT APPLICATION (STAGING)
+# Repo: CD Config Repository (myblogspot-cd)
 # Environment: Staging
 # Namespace: staging
 # ==============================================================================
@@ -33,3 +33,10 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+  ignoreDifferences:
+    - group: external-secrets.io
+      kind: ExternalSecret
+      jsonPointers:
+        - /spec/data
+        - /spec/target/deletionPolicy
+        - /spec/target/template/mergePolicy
