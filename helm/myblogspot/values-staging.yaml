@@ -1,10 +1,18 @@
 # Staging Environment Overrides
 environment: staging
+
 postgres:
+  enabled: false
+
+externalSecrets:
   enabled: true
-  user: "myblogspot"
-  password: "secret-staging-password"
-  db: "myblogspot_staging"
+  refreshInterval: "1h"
+  secretStoreRef:
+    name: "aws-secretsmanager"
+    kind: "ClusterSecretStore"
+  rdsSecretKey: "rds!db-fd8eb0c7-a365-4966-89e8-7667f8f8cc17"
+  appSecretKey: "staging/myblogspot/app-secrets"
+
 backend:
   replicaCount: 1
   image:
@@ -22,21 +30,16 @@ backend:
     ENV: "staging"
     LOG_LEVEL: "info"
     BASE_URL: "https://staging.hnblong.site"
-    DB_HOST: "myblogspot-postgres"
+    DB_HOST: "staging-myblogspot-postgres.czrn6lud72vp.ap-southeast-2.rds.amazonaws.com"
     DB_PORT: "5432"
     DB_NAME: "myblogspot_staging"
-    DB_USER: "myblogspot"
-    DB_SSLMODE: "disable"
+    DB_USER: "myblogspot_admin"
+    DB_SSLMODE: "require"
     REDIS_ENABLED: "false"
     CORS_ALLOWED_ORIGINS: "https://staging.hnblong.site"
     ADMIN_INITIAL_USERNAME: "admin"
-    ADMIN_INITIAL_PASSWORD: "Admin@123456"
     ADMIN_INITIAL_EMAIL: "admin@hnblong.site"
-  secrets:
-    DB_URL: "postgresql://myblogspot:secret-staging-password@myblogspot-postgres:5432/myblogspot_staging?sslmode=disable"
-    DB_PASSWORD: "secret-staging-password"
-    REDIS_URL: "redis://myblogspot-redis:6379"
-    JWT_SECRET: "staging-jwt-secret-key-123456"
+
 frontend:
   replicaCount: 1
   image:
@@ -54,9 +57,11 @@ frontend:
     NODE_ENV: "production"
     NEXT_PUBLIC_API_URL: ""
     INTERNAL_API_URL: "http://myblogspot-staging-backend:8080"
+
 ingress:
   enabled: true
   className: "alb"
+  tls: []
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
@@ -84,5 +89,6 @@ ingress:
         - path: /
           pathType: Prefix
           service: frontend
+
 networkPolicy:
   enabled: false

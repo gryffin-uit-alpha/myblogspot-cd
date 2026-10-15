@@ -3,7 +3,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- Admin table
-CREATE TABLE admins (
+CREATE TABLE IF NOT EXISTS admins (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username VARCHAR(50) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE admins (
 );
 
 -- Categories table
-CREATE TABLE categories (
+CREATE TABLE IF NOT EXISTS categories (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(100) UNIQUE NOT NULL,
     slug VARCHAR(100) UNIQUE NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE categories (
 );
 
 -- Articles table
-CREATE TABLE articles (
+CREATE TABLE IF NOT EXISTS articles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title VARCHAR(255) NOT NULL,
     slug VARCHAR(255) UNIQUE NOT NULL,
@@ -40,7 +40,7 @@ CREATE TABLE articles (
 );
 
 -- Tags table
-CREATE TABLE tags (
+CREATE TABLE IF NOT EXISTS tags (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(50) UNIQUE NOT NULL,
     slug VARCHAR(50) UNIQUE NOT NULL,
@@ -48,7 +48,7 @@ CREATE TABLE tags (
 );
 
 -- Article-Tags join table
-CREATE TABLE article_tags (
+CREATE TABLE IF NOT EXISTS article_tags (
     article_id UUID NOT NULL REFERENCES articles(id) ON DELETE CASCADE,
     tag_id UUID NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -56,7 +56,7 @@ CREATE TABLE article_tags (
 );
 
 -- Sessions table for nickname tracking
-CREATE TABLE sessions (
+CREATE TABLE IF NOT EXISTS sessions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     session_token VARCHAR(64) UNIQUE NOT NULL,
     nickname VARCHAR(50),
@@ -64,10 +64,10 @@ CREATE TABLE sessions (
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_sessions_token ON sessions(session_token);
+CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(session_token);
 
 -- Comments table
-CREATE TABLE comments (
+CREATE TABLE IF NOT EXISTS comments (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     article_id UUID NOT NULL REFERENCES articles(id) ON DELETE CASCADE,
     session_id UUID REFERENCES sessions(id) ON DELETE SET NULL,
@@ -80,7 +80,7 @@ CREATE TABLE comments (
 );
 
 -- Images table
-CREATE TABLE images (
+CREATE TABLE IF NOT EXISTS images (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     filename VARCHAR(255) NOT NULL,
     original_filename VARCHAR(255) NOT NULL,
@@ -93,7 +93,7 @@ CREATE TABLE images (
 );
 
 -- Homepage settings table
-CREATE TABLE homepage_settings (
+CREATE TABLE IF NOT EXISTS homepage_settings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     hero_title VARCHAR(255) NOT NULL DEFAULT 'Welcome',
     hero_subtitle TEXT NOT NULL DEFAULT 'Your digital space',
@@ -105,20 +105,20 @@ CREATE TABLE homepage_settings (
 );
 
 -- Indexes
-CREATE INDEX idx_articles_category ON articles(category_id);
-CREATE INDEX idx_articles_status ON articles(status);
-CREATE INDEX idx_articles_published_at ON articles(published_at DESC);
-CREATE INDEX idx_articles_search_vector ON articles USING GIN(search_vector);
+CREATE INDEX IF NOT EXISTS idx_articles_category ON articles(category_id);
+CREATE INDEX IF NOT EXISTS idx_articles_status ON articles(status);
+CREATE INDEX IF NOT EXISTS idx_articles_published_at ON articles(published_at DESC);
+CREATE INDEX IF NOT EXISTS idx_articles_search_vector ON articles USING GIN(search_vector);
 
-CREATE INDEX idx_article_tags_tag ON article_tags(tag_id);
+CREATE INDEX IF NOT EXISTS idx_article_tags_tag ON article_tags(tag_id);
 
-CREATE INDEX idx_comments_article ON comments(article_id);
-CREATE INDEX idx_comments_created_at ON comments(created_at DESC);
-CREATE INDEX idx_comments_rate_limit ON comments(ip_address, created_at);
-CREATE INDEX idx_comments_parent ON comments(parent_id) WHERE parent_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_comments_article ON comments(article_id);
+CREATE INDEX IF NOT EXISTS idx_comments_created_at ON comments(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_comments_rate_limit ON comments(ip_address, created_at);
+CREATE INDEX IF NOT EXISTS idx_comments_parent ON comments(parent_id) WHERE parent_id IS NOT NULL;
 
-CREATE INDEX idx_images_folder ON images(folder);
-CREATE INDEX idx_images_created_at ON images(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_images_folder ON images(folder);
+CREATE INDEX IF NOT EXISTS idx_images_created_at ON images(created_at DESC);
 
 -- Triggers
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -129,23 +129,28 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS articles_updated_at ON articles;
 CREATE TRIGGER articles_updated_at
 BEFORE UPDATE ON articles
 FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS categories_updated_at ON categories;
 CREATE TRIGGER categories_updated_at
 BEFORE UPDATE ON categories
 FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS admins_updated_at ON admins;
 CREATE TRIGGER admins_updated_at
 BEFORE UPDATE ON admins
 FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS homepage_settings_updated_at ON homepage_settings;
 CREATE TRIGGER homepage_settings_updated_at
 BEFORE UPDATE ON homepage_settings
 FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Full-text search trigger
+DROP TRIGGER IF EXISTS articles_search_vector_update ON articles;
 CREATE TRIGGER articles_search_vector_update
 BEFORE INSERT OR UPDATE ON articles
 FOR EACH ROW EXECUTE FUNCTION

@@ -83,6 +83,19 @@ backend:
     JWT_SECRET: "change-me-in-production-vault"
 
 # ==========================================
+# External Secrets Operator Configuration
+# ==========================================
+externalSecrets:
+  enabled: false
+  refreshInterval: "1h"
+  secretStoreRef:
+    name: "aws-secretsmanager"
+    kind: "ClusterSecretStore"
+  rdsSecretKey: ""
+  appSecretKey: ""
+
+
+# ==========================================
 # Frontend Service Configuration (Next.js 14)
 # ==========================================
 frontend:
