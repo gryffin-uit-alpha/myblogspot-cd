@@ -15,9 +15,13 @@ externalSecrets:
 
 backend:
   replicaCount: 3
+  serviceAccount:
+    create: true
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::736052310305:role/production-myblogspot-backend-s3-role
   image:
     repository: 736052310305.dkr.ecr.ap-southeast-2.amazonaws.com/production-myblogspot-backend
-    tag: "7e537a18671fe6ceafa6f6cdda62af9566dd9637"
+    tag: "0e7e23e8907493399fb6cdba680563387cefa941"
   resources:
     requests:
       cpu: 150m
@@ -30,6 +34,8 @@ backend:
     ENV: "production"
     LOG_LEVEL: "warn"
     BASE_URL: "https://hnblong.site"
+    S3_BUCKET: "production-myblogspot-uploads-736052310305"
+    AWS_REGION: "ap-southeast-2"
     DB_HOST: "production-myblogspot-postgres.czrn6lud72vp.ap-southeast-2.rds.amazonaws.com"
     DB_PORT: "5432"
     DB_NAME: "myblogspot_prod"
