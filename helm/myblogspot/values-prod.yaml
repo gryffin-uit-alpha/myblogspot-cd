@@ -21,7 +21,7 @@ backend:
       eks.amazonaws.com/role-arn: arn:aws:iam::736052310305:role/production-myblogspot-backend-s3-role
   image:
     repository: 736052310305.dkr.ecr.ap-southeast-2.amazonaws.com/production-myblogspot-backend
-    tag: "0e7e23e8907493399fb6cdba680563387cefa941"
+    tag: "683ff1be54f2290e55ae474b3e6f78b6cf6d19fc"
   resources:
     requests:
       cpu: 150m
@@ -50,7 +50,7 @@ frontend:
   replicaCount: 3
   image:
     repository: 736052310305.dkr.ecr.ap-southeast-2.amazonaws.com/production-myblogspot-frontend
-    tag: "7e537a18671fe6ceafa6f6cdda62af9566dd9637"
+    tag: "683ff1be54f2290e55ae474b3e6f78b6cf6d19fc"
   resources:
     requests:
       cpu: 100m
