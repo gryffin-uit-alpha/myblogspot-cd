@@ -1,8 +1,23 @@
-# Production Environment Overrides
+# Production Environment Overrides (Phase 3 Ready)
 environment: production
+
+postgres:
+  enabled: false
+
+externalSecrets:
+  enabled: true
+  refreshInterval: "1h"
+  secretStoreRef:
+    name: "aws-secretsmanager"
+    kind: "ClusterSecretStore"
+  rdsSecretKey: "production/myblogspot/rds-secret"
+  appSecretKey: "production/myblogspot/app-secrets"
 
 backend:
   replicaCount: 3
+  image:
+    repository: 736052310305.dkr.ecr.ap-southeast-2.amazonaws.com/production-myblogspot-backend
+    tag: "7e537a18671fe6ceafa6f6cdda62af9566dd9637"
   resources:
     requests:
       cpu: 150m
@@ -10,9 +25,26 @@ backend:
     limits:
       cpu: 500m
       memory: 384Mi
+  env:
+    PORT: "8080"
+    ENV: "production"
+    LOG_LEVEL: "warn"
+    BASE_URL: "https://hnblong.site"
+    DB_HOST: "production-myblogspot-postgres.czrn6lud72vp.ap-southeast-2.rds.amazonaws.com"
+    DB_PORT: "5432"
+    DB_NAME: "myblogspot_prod"
+    DB_USER: "myblogspot_admin"
+    DB_SSLMODE: "require"
+    REDIS_ENABLED: "false"
+    CORS_ALLOWED_ORIGINS: "https://hnblong.site"
+    ADMIN_INITIAL_USERNAME: "admin"
+    ADMIN_INITIAL_EMAIL: "admin@hnblong.site"
 
 frontend:
   replicaCount: 3
+  image:
+    repository: 736052310305.dkr.ecr.ap-southeast-2.amazonaws.com/production-myblogspot-frontend
+    tag: "7e537a18671fe6ceafa6f6cdda62af9566dd9637"
   resources:
     requests:
       cpu: 100m
@@ -20,8 +52,24 @@ frontend:
     limits:
       cpu: 500m
       memory: 384Mi
+  env:
+    PORT: "3000"
+    NODE_ENV: "production"
+    NEXT_PUBLIC_API_URL: ""
+    INTERNAL_API_URL: "http://myblogspot-production-backend:8080"
 
 ingress:
+  enabled: true
+  className: "alb"
+  tls: []
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-southeast-2:736052310305:certificate/3c930980-2b2a-4338-85af-59a7a251ae0e
+    alb.ingress.kubernetes.io/healthcheck-path: /
+    alb.ingress.kubernetes.io/success-codes: "200,301,302"
   hosts:
     - host: hnblong.site
       paths:
@@ -43,10 +91,26 @@ ingress:
         - path: /
           pathType: Prefix
           service: frontend
-  tls:
-    - secretName: myblogspot-prod-tls
-      hosts:
-        - hnblong.site
+
+networkPolicy:
+  enabled: true
+  vpcCidr: "10.200.0.0/16"
+  databaseSubnetCidrs:
+    - "10.200.48.0/24"
+    - "10.200.49.0/24"
+
+hpa:
+  enabled: true
+  backend:
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+  frontend:
+    minReplicas: 3
+    maxReplicas: 8
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
 
 serviceMonitor:
   enabled: true
