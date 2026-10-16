@@ -50,7 +50,7 @@ frontend:
   replicaCount: 3
   image:
     repository: 736052310305.dkr.ecr.ap-southeast-2.amazonaws.com/production-myblogspot-frontend
-    tag: "5c2f7b3cbbf4effdafb8cad9610217cb2e7330ab"
+    tag: "bff9a7c2e0c74eb92fa36b266ad16900e65bd01c"
   resources:
     requests:
       cpu: 100m
