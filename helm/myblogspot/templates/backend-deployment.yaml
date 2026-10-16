@@ -1,3 +1,17 @@
+{{- if and .Values.backend.serviceAccount .Values.backend.serviceAccount.create -}}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "myblogspot.fullname" . }}-backend
+  labels:
+    {{- include "myblogspot.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backend
+  {{- with .Values.backend.serviceAccount.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+---
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -27,6 +41,9 @@ spec:
         prometheus.io/port: "{{ .Values.backend.service.port }}"
         prometheus.io/path: "/metrics"
     spec:
+      {{- if and .Values.backend.serviceAccount .Values.backend.serviceAccount.create }}
+      serviceAccountName: {{ include "myblogspot.fullname" . }}-backend
+      {{- end }}
       {{- with .Values.backend.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}

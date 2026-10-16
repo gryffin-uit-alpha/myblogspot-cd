@@ -83,7 +83,7 @@ spec:
         - protocol: TCP
           port: {{ .Values.backend.service.port }}
 ---
-# 5. Allow Backend Pod -> AWS RDS PostgreSQL Subnets ONLY (Port 5432)
+# 5. Allow Backend Pod -> AWS RDS PostgreSQL (5432) & AWS S3 / STS IRSA (443)
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -105,4 +105,7 @@ spec:
       ports:
         - protocol: TCP
           port: 5432
+    - ports:
+        - protocol: TCP
+          port: 443
 {{- end }}

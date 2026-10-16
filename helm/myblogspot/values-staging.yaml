@@ -15,9 +15,13 @@ externalSecrets:
 
 backend:
   replicaCount: 1
+  serviceAccount:
+    create: true
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::736052310305:role/staging-myblogspot-backend-s3-role
   image:
     repository: 736052310305.dkr.ecr.ap-southeast-2.amazonaws.com/staging-myblogspot-backend
-    tag: "7e537a18671fe6ceafa6f6cdda62af9566dd9637" # Updated automatically by CI/CD GitOps
+    tag: "0e7e23e8907493399fb6cdba680563387cefa941" # Updated automatically by CI/CD GitOps
   resources:
     requests:
       cpu: 50m
@@ -30,6 +34,8 @@ backend:
     ENV: "staging"
     LOG_LEVEL: "info"
     BASE_URL: "https://staging.hnblong.site"
+    S3_BUCKET: "staging-myblogspot-uploads-736052310305"
+    AWS_REGION: "ap-southeast-2"
     DB_HOST: "staging-myblogspot-postgres.czrn6lud72vp.ap-southeast-2.rds.amazonaws.com"
     DB_PORT: "5432"
     DB_NAME: "myblogspot_staging"
