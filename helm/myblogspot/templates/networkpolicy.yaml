@@ -1,21 +1,45 @@
 {{- if .Values.networkPolicy.enabled -}}
-# 1. Default Deny All Ingress in Namespace
+# ==============================================================================
+# ZERO-TRUST KUBERNETES NETWORK POLICIES (INGRESS + EGRESS ISOLATION)
+# Compatible with AWS ALB Controller (target-type: ip) & AWS RDS Subnets
+# ==============================================================================
+
+# 1. Default Deny All Ingress & Egress in Namespace
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: {{ include "myblogspot.fullname" . }}-default-deny
+  name: {{ include "myblogspot.fullname" . }}-default-deny-all
   labels:
     {{- include "myblogspot.labels" . | nindent 4 }}
 spec:
   podSelector: {}
   policyTypes:
     - Ingress
+    - Egress
 ---
-# 2. Allow Ingress Controller to Frontend & Backend
+# 2. Allow DNS Resolution (CoreDNS UDP/TCP 53) for All Pods in Namespace
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: {{ include "myblogspot.fullname" . }}-allow-ingress
+  name: {{ include "myblogspot.fullname" . }}-allow-dns-egress
+  labels:
+    {{- include "myblogspot.labels" . | nindent 4 }}
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    - ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+---
+# 3. Allow AWS ALB & Kubelet Probes (VPC CIDR) + Prometheus Scraping to Workloads
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "myblogspot.fullname" . }}-allow-alb-and-probes-ingress
   labels:
     {{- include "myblogspot.labels" . | nindent 4 }}
 spec:
@@ -28,6 +52,8 @@ spec:
     - Ingress
   ingress:
     - from:
+        - ipBlock:
+            cidr: {{ .Values.networkPolicy.vpcCidr | default "10.100.0.0/16" }}
         - namespaceSelector: {}
       ports:
         - protocol: TCP
@@ -35,7 +61,7 @@ spec:
         - protocol: TCP
           port: {{ .Values.frontend.service.targetPort }}
 ---
-# 3. Allow Frontend to Call Backend API
+# 4. Allow Frontend Pod <-> Backend Pod (Port 8080)
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -45,15 +71,38 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      app.kubernetes.io/component: backend
+      app.kubernetes.io/component: frontend
   policyTypes:
-    - Ingress
-  ingress:
-    - from:
+    - Egress
+  egress:
+    - to:
         - podSelector:
             matchLabels:
-              app.kubernetes.io/component: frontend
+              app.kubernetes.io/component: backend
       ports:
         - protocol: TCP
           port: {{ .Values.backend.service.port }}
+---
+# 5. Allow Backend Pod -> AWS RDS PostgreSQL Subnets ONLY (Port 5432)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "myblogspot.fullname" . }}-backend-to-rds-egress
+  labels:
+    {{- include "myblogspot.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: backend
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        {{- range .Values.networkPolicy.databaseSubnetCidrs }}
+        - ipBlock:
+            cidr: {{ . }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: 5432
 {{- end }}

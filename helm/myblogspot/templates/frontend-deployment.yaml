@@ -6,7 +6,9 @@ metadata:
     {{- include "myblogspot.labels" . | nindent 4 }}
     app.kubernetes.io/component: frontend
 spec:
+  {{- if not .Values.hpa.enabled }}
   replicas: {{ .Values.frontend.replicaCount }}
+  {{- end }}
   strategy:
     type: RollingUpdate
     rollingUpdate:

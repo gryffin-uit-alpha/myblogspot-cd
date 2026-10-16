@@ -194,6 +194,26 @@ ingress:
 # ==========================================
 networkPolicy:
   enabled: true
+  vpcCidr: "10.100.0.0/16"
+  databaseSubnetCidrs:
+    - "10.100.48.0/24"
+    - "10.100.49.0/24"
+
+# ==========================================
+# Horizontal Pod Autoscaler (HPA v2)
+# ==========================================
+hpa:
+  enabled: false
+  backend:
+    minReplicas: 2
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+  frontend:
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
 
 # ==========================================
 # Prometheus Metrics Scraping
@@ -210,4 +230,5 @@ postgres:
   user: "myblogspot"
   password: "secret-password"
   db: "myblogspot_dev"
+
 
