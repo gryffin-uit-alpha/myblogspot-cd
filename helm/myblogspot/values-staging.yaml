@@ -50,7 +50,7 @@ frontend:
   replicaCount: 1
   image:
     repository: 736052310305.dkr.ecr.ap-southeast-2.amazonaws.com/staging-myblogspot-frontend
-    tag: "8473fa728c1363ca7a3617daa3a86f2efae2aabf" # Updated automatically by CI/CD GitOps
+    tag: "5c2f7b3cbbf4effdafb8cad9610217cb2e7330ab" # Updated automatically by CI/CD GitOps
   resources:
     requests:
       cpu: 50m
