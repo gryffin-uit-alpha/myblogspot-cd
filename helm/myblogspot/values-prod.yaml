@@ -21,7 +21,7 @@ backend:
       eks.amazonaws.com/role-arn: arn:aws:iam::736052310305:role/production-myblogspot-backend-s3-role
   image:
     repository: 736052310305.dkr.ecr.ap-southeast-2.amazonaws.com/production-myblogspot-backend
-    tag: "8473fa728c1363ca7a3617daa3a86f2efae2aabf"
+    tag: "06ea464791461909ce25cf94e8c13fe17a20a411"
   resources:
     requests:
       cpu: 150m
