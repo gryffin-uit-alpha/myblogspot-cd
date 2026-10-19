@@ -10,7 +10,7 @@ externalSecrets:
   secretStoreRef:
     name: "aws-secretsmanager"
     kind: "ClusterSecretStore"
-  rdsSecretKey: "production/myblogspot/rds-secret"
+  rdsSecretKey: "rds!db-ec9a29d8-cb93-410a-8b62-c38d67c8df00"
   appSecretKey: "production/myblogspot/app-secrets"
 
 backend:
@@ -73,7 +73,7 @@ ingress:
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
     alb.ingress.kubernetes.io/ssl-redirect: '443'
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-southeast-2:736052310305:certificate/3c930980-2b2a-4338-85af-59a7a251ae0e
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-southeast-2:736052310305:certificate/e6286512-65cf-4a37-ad28-d514302a6260
     alb.ingress.kubernetes.io/healthcheck-path: /
     alb.ingress.kubernetes.io/success-codes: "200,301,302"
   hosts:
